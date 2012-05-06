@@ -42,21 +42,6 @@ def worker(q2, q):
     globale += mye
     q2.put(globale)
 
-#workers = [WorkerThread(i) for i in xrange(5)]
-
-#for i in workers:
-    #i.run()
-
-#def workerStatus(workers):
-    #for i in workers:
-        #if not i.isAlive():
-            #return False
-    #return True
-
-## Wait for threads to finish
-#while workerStatus(workers):
-    #pass
-
 q = Queue()
 q2 = Queue()
 for i in xrange(n + 1):
@@ -64,20 +49,13 @@ for i in xrange(n + 1):
 
 q2.put(globale)
 processes = [Process(target=worker, args=(q2, q)) for i in xrange(totalWorkers)]
+# Start all processes
 for i in processes:
     i.start()
+
+# Wait for all processes to complete
 for i in processes:
     i.join()
-#p = Process(target=worker, args=(q2, q))
-#p2 = Process(target=worker, args=(q2, q))
-#p.start()
-#p2.start()
-#p.join()
-#p2.join()
-
-#pool = Pool(processes=4)
-#result = pool.apply(worker)
-
 
 globale = q2.get()
 print "Suskaiciavau e: "
