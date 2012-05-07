@@ -1,12 +1,11 @@
 import math
 from decimal import *
-import threading
 from multiprocessing import Process, Queue
 
 # Set precision
-getcontext().prec = 2000
-n = 2000
-totalWorkers = 8 
+getcontext().prec = 10000
+n = 5000
+totalWorkers = 8
 
 def factorialGenerator(n):
     num = 0
@@ -59,8 +58,8 @@ for i in processes:
 
 globale = q2.get()
 print "Suskaiciavau e: "
-#print globale
-#print "Tikras e: "
-#print (Decimal(1).exp())
-#print "Taiklumas: "
-#print (Decimal(1).exp() - globale)
+print globale
+print "Tikras e: "
+print (Decimal(1).exp())
+print "Taiklumas: "
+print (Decimal(1).exp() - globale)
