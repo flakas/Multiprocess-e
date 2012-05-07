@@ -4,7 +4,7 @@ from multiprocessing import Process, Queue
 
 # Set precision
 getcontext().prec = 10000
-n = 5000
+n = 4000
 totalWorkers = 8
 
 def factorialGenerator(n):
@@ -17,13 +17,6 @@ globalGenerator = factorialGenerator(n)
 
 globale = Decimal(0)
 one = Decimal(1)
-
-class WorkerThread(threading.Thread):
-    def __init__(self, threadID):
-        self.threadID = threadID
-        threading.Thread.__init__(self)
-    def run(self):
-        worker()
 
 
 def worker(q2, q):
@@ -56,10 +49,13 @@ for i in processes:
 for i in processes:
     i.join()
 
+real_e = Decimal(1).exp()
+
+
 globale = q2.get()
 print "Suskaiciavau e: "
 print globale
 print "Tikras e: "
-print (Decimal(1).exp())
-print "Taiklumas: "
-print (Decimal(1).exp() - globale)
+print (real_e)
+print "Tikslumas: "
+print (real_e - globale)
