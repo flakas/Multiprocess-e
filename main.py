@@ -63,14 +63,14 @@ def worker(q2, q):
     one = Decimal(1)
     while not q.empty():
         try:
-            mye += one / math.factorial(q.get())
+            mye += one / math.factorial(q.get(block=True))
         except Exception as ex:
             print ex
             print 'Worker: ' + str(ex)
             break
-    globale = q2.get()
+    globale = q2.get(block=True)
     globale += mye
-    q2.put(globale)
+    q2.put(globale, block=True)
 
 q = Queue()
 q2 = Queue()
@@ -119,30 +119,41 @@ statsQueue = Queue()
 statsQueue.put({})
 def substringFinder(lengthsQueue, statsQueue, e_str):
     substrings = {}
+    substringCounts = {}
     while not lengthsQueue.empty():
         try:
-            length = lengthsQueue.get()
+            length = lengthsQueue.get(block=True)
+            foundSubstrings = 0
             for i in xrange(0, int(len(e_str) - length)):
                 s = e_str[i:i+length]
                 if not s in substrings.values() and e_str.count(s) >= 2:
                     substrings.update({s: e_str.count(s)})
+                    foundSubstrings += 1
+            if foundSubstrings == 0:
+                break
         except Exception as ex:
             print 'Exception', str(ex)
             break
-    globalSubstrings = statsQueue.get()
-    globalSubstrings.update(substrings)
-    statsQueue.put(globalSubstrings)
+    #globalSubstrings = statsQueue.get()
+    #globalSubstrings.update(substrings)
+    statsQueue.put(substrings, block=True)
 
 processes = [Process(target=substringFinder, args=(lengthsQueue, statsQueue, e_str)) for i in xrange(longest_processes)]
 # Start all processes
 for i in processes:
     i.start()
 
+sequences = {}
 # Wait for all processes to complete
 for i in processes:
-    i.join()
+    sequences.update(statsQueue.get())
+    #i.join()
 
-sequences = statsQueue.get()
+#sequences = {}
+#while not statsQueue.empty():
+    #sequences.update(statsQueue.get())
+
+#sequences = statsQueue.get()
 
 
 #curr_len = int(len(e_str) / 10)
