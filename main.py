@@ -38,6 +38,14 @@ def f2(n):
         myE += one / fact
         yield myE
 
+def factorialGenerator(n):
+    fact = 1
+    yield fact
+    for i in xrange(1, n + 1):
+        fact *= i
+        yield fact
+
+
 f2generator = f2(cmp_n)
 reale = Decimal(1).exp()
 
@@ -63,7 +71,7 @@ def worker(q2, q):
     one = Decimal(1)
     while not q.empty():
         try:
-            mye += one / math.factorial(q.get(block=True))
+            mye += one / q.get(block=True)
         except Exception as ex:
             print ex
             print 'Worker: ' + str(ex)
@@ -74,7 +82,7 @@ def worker(q2, q):
 
 q = Queue()
 q2 = Queue()
-for i in xrange(longest_n + 1):
+for i in factorialGenerator(longest_n + 1):
     q.put(i)
 
 q2.put(globale)
@@ -87,6 +95,7 @@ for i in processes:
 for i in processes:
     i.join()
 
+print 'Skaiciuoju exp(1)'
 real_e = Decimal(1).exp()
 
 globale = q2.get()
