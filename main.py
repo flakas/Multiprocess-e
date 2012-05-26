@@ -4,6 +4,7 @@ from decimal import *
 from multiprocessing import Process, Queue
 from sys import argv
 import string
+import time
 from itertools import groupby
 
 # Set precision
@@ -125,7 +126,7 @@ for i in xrange(2, int(len(e_str) / 10)):
 print 'Sudedu ilgius i eile'
 
 statsQueue = Queue()
-statsQueue.put({})
+#statsQueue.put({})
 def substringFinder(lengthsQueue, statsQueue, e_str):
     substrings = {}
     substringCounts = {}
@@ -148,6 +149,11 @@ def substringFinder(lengthsQueue, statsQueue, e_str):
     statsQueue.put(substrings)
     return
 
+print 'Uzbaigineju praeitus procesus, galbut likusius'
+for i in processes:
+    if i.is_alive():
+        i.terminate()
+
 print 'Paleidineju procesus'
 processes = [Process(target=substringFinder, args=(lengthsQueue, statsQueue, e_str)) for i in xrange(longest_processes)]
 # Start all processes
@@ -157,8 +163,15 @@ for i in processes:
 print 'Paleidau procesus, laukiu, kol jie baigs'
 sequences = {}
 # Wait for all processes to complete
-for i in processes:
-    sequences.update(statsQueue.get())
+seq = []
+#for i in processes:
+while len(seq) < longest_processes:
+    #sequences.update(statsQueue.get())
+    seq.append(statsQueue.get())
+    time.sleep(5)
+print 'Turi tiek, kiek reikia itemu'
+for i in seq:
+    sequences.update(i)
     #i.join()
 
 #sequences = {}
