@@ -71,40 +71,38 @@ def worker(q2, q):
     one = Decimal(1)
     while not q.empty():
         try:
-            mye += one / q.get(block=True)
+            mye += one / q.get()
         except Exception as ex:
             print ex
             print 'Worker: ' + str(ex)
             break
-    globale = q2.get(block=True)
-    globale += mye
-    q2.put(globale, block=True)
+    q2.put(mye)
+    return
 
 q = Queue()
 q2 = Queue()
 for i in factorialGenerator(longest_n + 1):
     q.put(i)
 
-q2.put(globale)
 processes = [Process(target=worker, args=(q2, q)) for i in xrange(longest_processes)]
 # Start all processes
 for i in processes:
     i.start()
 
+globale = Decimal(0)
 # Wait for all processes to complete
 for i in processes:
-    i.join()
+    globale += q2.get()
 
-print 'Skaiciuoju exp(1)'
-real_e = Decimal(1).exp()
+#print 'Skaiciuoju exp(1)'
+#real_e = Decimal(1).exp()
 
-globale = q2.get()
 print "Suskaiciavau e: "
 print globale
-print "Tikras e: "
-print (real_e)
-print "Tikslumas: "
-print (real_e - globale)
+#print "Tikras e: "
+#print (real_e)
+#print "Tikslumas: "
+#print (real_e - globale)
 
 #print 'Ieskau dazniausiai pasikartojancios sekos'
 ## Find longest most frequent sequence
@@ -124,6 +122,8 @@ lengthsQueue = Queue()
 for i in xrange(2, int(len(e_str) / 10)):
     lengthsQueue.put(i)
 
+print 'Sudedu ilgius i eile'
+
 statsQueue = Queue()
 statsQueue.put({})
 def substringFinder(lengthsQueue, statsQueue, e_str):
@@ -131,7 +131,7 @@ def substringFinder(lengthsQueue, statsQueue, e_str):
     substringCounts = {}
     while not lengthsQueue.empty():
         try:
-            length = lengthsQueue.get(block=True)
+            length = lengthsQueue.get()
             foundSubstrings = 0
             for i in xrange(0, int(len(e_str) - length)):
                 s = e_str[i:i+length]
@@ -145,13 +145,16 @@ def substringFinder(lengthsQueue, statsQueue, e_str):
             break
     #globalSubstrings = statsQueue.get()
     #globalSubstrings.update(substrings)
-    statsQueue.put(substrings, block=True)
+    statsQueue.put(substrings)
+    return
 
+print 'Paleidineju procesus'
 processes = [Process(target=substringFinder, args=(lengthsQueue, statsQueue, e_str)) for i in xrange(longest_processes)]
 # Start all processes
 for i in processes:
     i.start()
 
+print 'Paleidau procesus, laukiu, kol jie baigs'
 sequences = {}
 # Wait for all processes to complete
 for i in processes:
