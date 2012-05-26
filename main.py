@@ -67,30 +67,30 @@ print u'Skaiciuoju e kuo tiksliau...'
 
 getcontext().prec = longest_precision
 
-def worker(q2, q):
+def worker(q2, q, step):
     mye = Decimal(0)
     one = Decimal(1)
-    while not q.empty():
-        try:
-            mye += one / q.get()
-        except Exception as ex:
-            print ex
-            print 'Worker: ' + str(ex)
-            break
+
+    start = q.get()
+    first = one / math.factorial(start + 1)
+    mye += first
+    for i in xrange(start + 2, start + step + 1):
+        first *= one / i
+        mye += first
     q2.put(mye)
     return
 
 q = Queue()
 q2 = Queue()
-for i in factorialGenerator(longest_n + 1):
+for i in xrange(0, longest_n, longest_n / longest_processes):
     q.put(i)
 
-processes = [Process(target=worker, args=(q2, q)) for i in xrange(longest_processes)]
+processes = [Process(target=worker, args=(q2, q, longest_n / longest_processes)) for i in xrange(longest_processes)]
 # Start all processes
 for i in processes:
     i.start()
 
-globale = Decimal(0)
+globale = Decimal(1)
 # Wait for all processes to complete
 for i in processes:
     globale += q2.get()
